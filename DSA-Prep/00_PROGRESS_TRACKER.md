@@ -24,7 +24,7 @@
 - **Last session:** 2026-08-09 — DSA prep program designed: curriculum, 12-week phase plan, 476-question tracker, problem-solving framework, pattern cheat sheet, revision system.
 - **Next up:** Phase 0 → Complexity analysis refresher + Java DSA toolkit (collections, comparators, pitfalls), then Week 1 = Arrays / Prefix Sum / Two Pointers.
 - **Questions solved:** 0 / 476
-- **Hours logged:** 0h tracked (see Session Log)
+- **Hours logged:** 4h tracked (see Session Log)
 
 ---
 
@@ -37,7 +37,7 @@
 | Topics closed out (all CORE done + notes written) | 20 / 20 | 0 |
 | Timed mocks completed | 10 | 0 |
 | Revision passes on flagged problems | 3 full passes | 0 |
-| Hours invested (with Claude) | ~180–220h over 12 weeks at planned pace | 0h |
+| Hours invested (with Claude) | ~180–220h over 12 weeks at planned pace | 4h |
 
 **Actual mix in the list:** 81 Easy (17%) / 302 Medium (63%) / 93 Hard (20%) — the right shape for a Google-and-below loop, where mediums-with-a-twist dominate and hards cluster in graphs, DP and intervals.
 
@@ -167,6 +167,6 @@ _(Append one entry per session — date, phase, hours spent working with Claude 
 | Date | Phase | Hours | Covered | Questions | Notes / Follow-up |
 |------|-------|-------|---------|-----------|--------------------|
 | 2026-08-09 | Setup | — *(untracked)* | Program setup: curriculum, 12-week phase plan, 476-question tracker across 20 topics, 9-step problem-solving framework, pattern cheat sheet scaffold, revision queue. | 0 | Start Phase 0 next session: complexity depth + Java toolkit drill. Don't skip it — the toolkit fumbles are what cost time in real rounds. |
-| 2026-08-09 | Setup | — *(untracked)* | Built the live progress site (InterviewPrepHub): parses both trackers directly, deployed to GitHub Pages. Added Phase + Hours columns to both Session Logs so time investment is tracked going forward. | 0 | Tracking starts from the next real study session — tell Claude the hours at wrap-up and it gets logged here. |
+| 2026-08-09 | Setup | 4h | Built the live progress site (InterviewPrepHub): parses both trackers directly, deployed to GitHub Pages. Added Phase + Hours columns to both Session Logs. Published full curriculum, all 476 questions, LLD phase items, the pattern cheat sheet, a new Java toolkit reference sheet, and lesson notes onto the site itself. | 0 | Tracking starts from the next real study session — tell Claude the hours at wrap-up and it gets logged here. |
 
-**Total hours logged:** 0h *(tracking starts from the next study session — rows above predate it)*
+**Total hours logged:** 4h *(the setup/site-build session above — study-session tracking starts fresh from Phase 0)*
