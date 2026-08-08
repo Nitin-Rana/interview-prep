@@ -183,7 +183,6 @@ h1.title .accent { color: var(--accent); }
   border-radius: var(--radius);
   color: var(--text-dim);
   font-size: 14.5px;
-  max-width: 720px;
 }
 .about-block strong { color: var(--text); }
 
