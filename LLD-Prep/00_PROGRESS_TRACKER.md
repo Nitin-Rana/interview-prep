@@ -12,8 +12,8 @@
 ## Current Status
 
 - **Phase:** Phase 0 — Foundations
-- **Last session:** SOLID deep dive done (S/O/L/I/D with violation→fix code, the "OCP+LSP+ISP → depend on abstractions, DIP formalizes it" throughline) + exercise (`OrderProcessor` refactor hitting all 5 violations) completed across 3 review rounds, compiles and runs. Notes saved to notes/02_solid.md + handwritten notes/02_solid_handwritten.html.
-- **Next up:** UML class diagram notation (assoc., aggregation, composition, inheritance)
+- **Last session:** UML class diagram notation done — class box notation, the 6 relationships ranked weakest→strongest coupling (dependency/association/aggregation/composition/realization/inheritance), the aggregation-vs-composition lifecycle test, the "UML composition" vs "composition over inheritance" naming trap, multiplicity, and PlantUML-compatible text shorthand. Exercise: text-notation class diagram for a Library Management System (Person/Member/Librarian inheritance, Library/Book composition, Library/Librarian aggregation, Member/Loan/Book association, Catalog/Searchable realization, LoanService/NotificationService dependency). Notes saved to notes/03_uml_notation.md + handwritten notes/03_uml_notation_handwritten.html.
+- **Next up:** The 9-step LLD interview framework (walkthrough + practice on a toy example)
 - **Hours logged:** 0h tracked (2 pre-tracking sessions not timed — see Session Log)
 
 ---
@@ -21,7 +21,7 @@
 ## Phase 0 — Foundations
 - [x] OOP pillars deep dive (interview-depth, not textbook-depth)
 - [x] SOLID principles — with violation/fix code examples
-- [ ] UML class diagram notation (assoc., aggregation, composition, inheritance)
+- [x] UML class diagram notation (assoc., aggregation, composition, inheritance)
 - [ ] The 9-step LLD interview framework (walkthrough + practice on a toy example)
 - [~] **Concurrency for LLD** (own dedicated lesson — this is a top SDE2 interview area, gets full treatment, not a footnote):
   - [x] synchronized (instance vs static lock), volatile (visibility ≠ atomicity), thread-safe double-checked-locking Singleton, deadlock via lock ordering, immutability as thread-safety — covered as part of Lesson 1 (encapsulation × concurrency)
@@ -103,5 +103,6 @@ _(Append one entry per session — date, phase, hours spent working with Claude 
 |------|-------|-------|---------|--------------------|
 | 2026-08-08 | Phase 0 | — *(untracked)* | Phase 0: OOP pillars (encapsulation, abstraction, inheritance/LSP incl. Stack-extends-Vector & Circle/Ellipse, polymorphism, composition over inheritance/SimUDuck, interface vs abstract class, thread-safety × encapsulation: synchronized/volatile/double-checked locking/deadlock ordering/immutability). Exercise: Bird/Ostrich LSP fix via composition — iterated 4 rounds to a clean compile, runs correctly. JDK 21 (IntelliJ's bundled JBR) added to PATH. | Sparrow-only in demo — Penguin/Duck variants left as optional polish, not blocking. Next: SOLID. |
 | 2026-08-09 | Phase 0 | — *(untracked)* | Phase 0: SOLID (S/O/L/I/D, each with violation→fix code; LSP reframed as "what makes OCP safe"; DI-vs-DIP distinction; UnsupportedOperationException as the shared tell for LSP/ISP violations). Exercise: refactor a 5-violation `OrderProcessor` god class — 3 review rounds (signature mismatches, missing `public` on overrides, undefined `Connection` type, non-static inner classes, method-name typos in `main`), final pass fixed directly with inline `FIX:` comments per change, compiles and runs end to end. Both notes formats (plain .md + handwritten artifact) delivered per lesson going forward. | Concurrency checklist expanded into its own full sub-list per user request — synced treatment across tracker + curriculum. Next: UML notation + 9-step framework. |
+| 2026-08-09 | Phase 0 | — *(TBD — let me know how long this one took)* | Phase 0: UML class diagram notation — class box notation, 6 relationships ranked weakest→strongest coupling, aggregation-vs-composition lifecycle test, the "UML composition" vs "composition over inheritance" naming-collision trap, multiplicity, PlantUML-compatible text shorthand. Exercise: text-notation diagram for a Library Management System covering inheritance (Person/Member/Librarian), composition (Library/Book), aggregation (Library/Librarian), an association class (Member/Loan/Book), realization (Catalog/Searchable), and dependency (LoanService/NotificationService). | Diagram-sketching skill, not coding — deliberately different muscle than Lessons 1-2. Next: the 9-step LLD interview framework. |
 
-**Total hours logged:** 0h *(tracking starts from the next session — the two rows above predate it)*
+**Total hours logged:** 0h *(tracking starts once hours are backfilled for the rows above)*
