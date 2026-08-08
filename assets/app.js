@@ -458,6 +458,19 @@ function expandableTopicRow(topic) {
   </details>`;
 }
 
+// Short one-line facts (Phase, Week) become pills; prose fields (Last
+// session, Next up) become stacked full-width blocks — see the CSS comment
+// on .status-meta for why these can't share one equal-width grid.
+function statusHTML(pills, blocks) {
+  const pillHtml = pills
+    .map((p) => `<span class="status-pill"><span class="k">${p.k}</span><span class="v">${p.v}</span></span>`)
+    .join("");
+  const blockHtml = blocks
+    .map((b) => `<div class="status-block"><div class="k">${b.k}</div><div class="v">${b.v}</div></div>`)
+    .join("");
+  return `<div class="status-meta">${pillHtml}</div><div class="status-blocks">${blockHtml}</div>`;
+}
+
 function statCard(num, label) {
   // Correct value is in the DOM from the first paint — data-final only drives
   // the optional count-up polish, so a reveal animation that never fires
@@ -605,11 +618,13 @@ function renderLLD(md) {
   ringEl.setAttribute("stroke-dashoffset", c);
 
   // status card
-  document.getElementById("lld-status").innerHTML = `
-    <div class="status-item"><div class="k">Phase</div><div class="v">${status.phase ?? "—"}</div></div>
-    <div class="status-item"><div class="k">Last session</div><div class="v">${status.lastSession ?? "—"}</div></div>
-    <div class="status-item"><div class="k">Next up</div><div class="v">${status.nextUp ?? "—"}</div></div>
-  `;
+  document.getElementById("lld-status").innerHTML = statusHTML(
+    [{ k: "Phase", v: status.phase ?? "—" }],
+    [
+      { k: "Last session", v: status.lastSession ?? "—" },
+      { k: "Next up", v: status.nextUp ?? "—" },
+    ]
+  );
 
   // stat cards
   const lldHours = sumHours(log);
@@ -662,12 +677,16 @@ function renderDSA(md, questionsMd, revisionMd) {
   ringEl.setAttribute("data-final-offset", c - (qPct / 100) * c);
   ringEl.setAttribute("stroke-dashoffset", c);
 
-  document.getElementById("dsa-status").innerHTML = `
-    <div class="status-item"><div class="k">Phase</div><div class="v">${status.phase ?? "—"}</div></div>
-    <div class="status-item"><div class="k">Week</div><div class="v">${status.week ?? "—"}</div></div>
-    <div class="status-item"><div class="k">Last session</div><div class="v">${status.lastSession ?? "—"}</div></div>
-    <div class="status-item"><div class="k">Next up</div><div class="v">${status.nextUp ?? "—"}</div></div>
-  `;
+  document.getElementById("dsa-status").innerHTML = statusHTML(
+    [
+      { k: "Phase", v: status.phase ?? "—" },
+      { k: "Week", v: status.week ?? "—" },
+    ],
+    [
+      { k: "Last session", v: status.lastSession ?? "—" },
+      { k: "Next up", v: status.nextUp ?? "—" },
+    ]
+  );
 
   const dsaHours = sumHours(log);
   document.getElementById("dsa-stats").innerHTML = [
