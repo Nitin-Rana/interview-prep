@@ -6,12 +6,23 @@
 
 const FILES = {
   lldTracker: "LLD-Prep/00_PROGRESS_TRACKER.md",
+  lldCurriculum: "LLD-Prep/01_CURRICULUM.md",
+  lldNotesManifest: "LLD-Prep/notes/manifest.json",
+  lldNotesDir: "LLD-Prep/notes/",
+
   dsaTracker: "DSA-Prep/00_PROGRESS_TRACKER.md",
+  dsaCurriculum: "DSA-Prep/01_CURRICULUM.md",
   dsaQuestions: "DSA-Prep/03_QUESTION_TRACKER.md",
+  dsaCheatsheet: "DSA-Prep/04_PATTERN_CHEATSHEET.md",
   dsaRevision: "DSA-Prep/05_REVISION_QUEUE.md",
+  dsaJavaSheet: "DSA-Prep/notes/00_java_toolkit.md",
+  dsaNotesManifest: "DSA-Prep/notes/manifest.json",
+  dsaNotesDir: "DSA-Prep/notes/",
 };
 
 const STATUS_WEIGHT = { " ": 0, "x": 1, "~": 0.5, "★": 1 };
+const STATUS_ICON = { " ": "○", x: "✓", "~": "◐", "★": "★" };
+const STATUS_CLASS = { " ": "todo", x: "done", "~": "partial", "★": "mastered" };
 
 async function fetchText(path) {
   const res = await fetch(path, { cache: "no-store" });
@@ -20,6 +31,16 @@ async function fetchText(path) {
   // Git on Windows checks these files out as CRLF; every parser below assumes
   // bare \n, so normalize once here rather than defend it in every regex.
   return text.replace(/\r\n/g, "\n");
+}
+
+async function fetchJson(path, fallback = []) {
+  try {
+    const res = await fetch(path, { cache: "no-store" });
+    if (!res.ok) return fallback;
+    return await res.json();
+  } catch {
+    return fallback;
+  }
 }
 
 /* ---------- generic checklist parser (00_PROGRESS_TRACKER.md style) ---------- */
@@ -41,9 +62,13 @@ function parsePhaseChecklist(md) {
       current = null;
       continue;
     }
-    const item = line.match(/^\s*-\s\[([ x~★])\]\s+\*{0,2}(.+?)\*{0,2}$/);
+    const item = line.match(/^(\s*)-\s\[([ x~★])\]\s+(.+?)$/);
     if (item && current) {
-      current.items.push({ status: item[1], text: stripMd(item[2]) });
+      current.items.push({
+        indent: item[1].length,
+        status: item[2],
+        text: stripMd(item[3]),
+      });
     }
   }
   return phases.filter((p) => p.items.length > 0);
@@ -126,7 +151,7 @@ function parseQuestionTracker(md) {
   let current = null;
 
   const topicHeadRe = /^##\s+(T\d{2})\s*[—-]\s*(.+?)\s*\(\d+\)/;
-  const rowRe = /^\|\s*\d+\s*\|\s*\[([ x~★])\]\s*\|\s*\[([^\]]+)\]\([^)]*\)\s*\|\s*(E|M|H)\s*\|\s*(C|S)\s*\|\s*(.*?)\s*\|\s*([^|]+?)\s*\|\s*$/;
+  const rowRe = /^\|\s*\d+\s*\|\s*\[([ x~★])\]\s*\|\s*\[([^\]]+)\]\(([^)]*)\)\s*\|\s*(E|M|H)\s*\|\s*(C|S)\s*\|\s*(.*?)\s*\|\s*([^|]+?)\s*\|\s*$/;
 
   for (const line of lines) {
     const h = line.match(topicHeadRe);
@@ -140,8 +165,10 @@ function parseQuestionTracker(md) {
       current.rows.push({
         status: r[1],
         title: r[2],
-        diff: r[3],
-        tier: r[4],
+        url: r[3],
+        diff: r[4],
+        tier: r[5],
+        note: stripMd(r[6]),
       });
     }
   }
@@ -180,6 +207,180 @@ function parseRevisionQueue(md) {
     .map((cells) => ({ problem: stripMd(cells[0]), topic: cells[1], reason: stripMd(cells[2]) }));
 }
 
+/* ---------- markdown -> HTML (small hand-rolled renderer, no dependency) ----------
+ * Covers exactly what our own docs use: headings, bold/italic/inline code,
+ * links, fenced code blocks, tables, ordered/unordered lists (1 level of
+ * nesting), horizontal rules, paragraphs. Not a general CommonMark parser.
+ */
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// A relative markdown link like `[x](00_TRACKER.md)` or `[x](../foo.md)` is
+// written relative to the *source file's own folder*. Once its HTML lands in
+// index.html, an unresolved relative href would instead resolve against the
+// page's own URL — wrong file, and silently wrong if the page happens to be
+// served from a subpath (e.g. GitHub Pages project sites). Resolve eagerly
+// against the source file's directory so the emitted href is always correct.
+function resolveUrl(baseDir, url) {
+  if (/^([a-z][a-z0-9+.-]*:)|^#/i.test(url)) return url; // absolute URL, mailto:, or in-page anchor
+  try {
+    return new URL(baseDir + url, document.baseURI).href;
+  } catch {
+    return url;
+  }
+}
+
+function inlineMd(raw, baseDir = "") {
+  let s = raw;
+  // Whole-paragraph underscore-italic (our docs only ever use `_...text..._`
+  // wrapping an entire line, never mid-sentence). Handled as a special case
+  // rather than a generic substring regex: a naive `_(.+?)_` match latches
+  // onto the *first* inner underscore it finds — which breaks the moment the
+  // wrapped text contains its own underscore, e.g. a filename like
+  // `04_PATTERN_CHEATSHEET.md`, closing the <em> after "04" instead of at
+  // the real end of the sentence.
+  let wrapEm = false;
+  const wholeWrap = s.match(/^_(.+)_$/s);
+  if (wholeWrap) {
+    s = wholeWrap[1];
+    wrapEm = true;
+  }
+
+  s = escapeHtml(s);
+  s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
+  s = s.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    (_, t, u) => `<a href="${resolveUrl(baseDir, u)}" target="_blank" rel="noopener">${t}</a>`
+  );
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+  return wrapEm ? `<em>${s}</em>` : s;
+}
+
+function renderList(items, ordered, baseDir) {
+  const tag = ordered ? "ol" : "ul";
+  let html = "";
+  const stack = [];
+  for (const it of items) {
+    while (stack.length && it.indent < stack[stack.length - 1].indent) {
+      html += `</li></${stack.pop().tag}>`;
+    }
+    if (!stack.length || it.indent > stack[stack.length - 1].indent) {
+      html += `<${tag} class="md-list">`;
+      stack.push({ indent: it.indent, tag });
+    } else {
+      html += `</li>`;
+    }
+    html += `<li>${inlineMd(it.text, baseDir)}`;
+  }
+  while (stack.length) html += `</li></${stack.pop().tag}>`;
+  return html;
+}
+
+function renderMarkdown(md, baseDir = "") {
+  const lines = md.split("\n");
+  let html = "";
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
+
+    let m;
+    if ((m = line.match(/^```(\w*)\s*$/))) {
+      const codeLines = [];
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i])) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++;
+      html += `<pre class="md-code"><code>${escapeHtml(codeLines.join("\n"))}</code></pre>`;
+      continue;
+    }
+
+    if ((m = line.match(/^(#{1,6})\s+(.*)$/))) {
+      const level = m[1].length;
+      html += `<h${level} class="md-h md-h${level}">${inlineMd(m[2], baseDir)}</h${level}>`;
+      i++;
+      continue;
+    }
+
+    if (/^-{3,}\s*$/.test(line)) {
+      html += `<hr class="md-hr">`;
+      i++;
+      continue;
+    }
+
+    if (/^\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\|?[\s:-]+\|[\s:|-]*$/.test(lines[i + 1])) {
+      const headerCells = line.split("|").slice(1, -1).map((c) => c.trim());
+      i += 2;
+      const bodyRows = [];
+      while (i < lines.length && /^\|.*\|\s*$/.test(lines[i])) {
+        bodyRows.push(lines[i].split("|").slice(1, -1).map((c) => c.trim()));
+        i++;
+      }
+      html +=
+        `<div class="md-table-wrap"><table class="md-table"><thead><tr>` +
+        headerCells.map((c) => `<th>${inlineMd(c, baseDir)}</th>`).join("") +
+        `</tr></thead><tbody>` +
+        bodyRows.map((r) => `<tr>${r.map((c) => `<td>${inlineMd(c, baseDir)}</td>`).join("")}</tr>`).join("") +
+        `</tbody></table></div>`;
+      continue;
+    }
+
+    if (/^(\s*)-\s+(.*)$/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^(\s*)-\s+(.*)$/.test(lines[i])) {
+        const mm = lines[i].match(/^(\s*)-\s+(.*)$/);
+        items.push({ indent: mm[1].length, text: mm[2] });
+        i++;
+      }
+      html += renderList(items, false, baseDir);
+      continue;
+    }
+
+    if (/^(\s*)\d+\.\s+(.*)$/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^(\s*)\d+\.\s+(.*)$/.test(lines[i])) {
+        const mm = lines[i].match(/^(\s*)\d+\.\s+(.*)$/);
+        items.push({ indent: mm[1].length, text: mm[2] });
+        i++;
+      }
+      html += renderList(items, true, baseDir);
+      continue;
+    }
+
+    const paraLines = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() !== "" &&
+      !/^```/.test(lines[i]) &&
+      !/^#{1,6}\s/.test(lines[i]) &&
+      !/^\|.*\|\s*$/.test(lines[i]) &&
+      !/^(\s*)-\s+/.test(lines[i]) &&
+      !/^(\s*)\d+\.\s+/.test(lines[i]) &&
+      !/^-{3,}\s*$/.test(lines[i])
+    ) {
+      paraLines.push(lines[i]);
+      i++;
+    }
+    if (paraLines.length) {
+      html += `<p class="md-p">${inlineMd(paraLines.join(" "), baseDir)}</p>`;
+    } else {
+      i++;
+    }
+  }
+  return html;
+}
+
 /* ---------- rendering helpers ---------- */
 
 function animateNumber(el, to, duration = 900) {
@@ -194,18 +395,6 @@ function animateNumber(el, to, duration = 900) {
   requestAnimationFrame(tick);
 }
 
-function makeRing(pct, colorClass) {
-  const r = 34;
-  const c = 2 * Math.PI * r;
-  const offset = c - (pct / 100) * c;
-  return `
-    <svg class="ring-svg" width="84" height="84" viewBox="0 0 84 84">
-      <circle class="ring-track" cx="42" cy="42" r="${r}"></circle>
-      <circle class="ring-fill ${colorClass}" cx="42" cy="42" r="${r}"
-        stroke-dasharray="${c}" stroke-dashoffset="${c}" data-final-offset="${offset}"></circle>
-    </svg>`;
-}
-
 function barRow(name, done, total, pct, extraClass = "") {
   return `
     <div class="bar-row">
@@ -215,6 +404,58 @@ function barRow(name, done, total, pct, extraClass = "") {
       </div>
       <div class="bar-track"><div class="bar-fill ${extraClass}" data-final-width="${pct}"></div></div>
     </div>`;
+}
+
+// Same as barRow, but wrapped in <details> with the actual checklist items
+// underneath — this is "show me exactly what's in this phase," not just a %.
+function expandablePhaseRow(name, items) {
+  const s = summarize(items);
+  const rows = items
+    .map(
+      (it) => `<div class="chk-row chk-${STATUS_CLASS[it.status]}" style="padding-left:${it.indent > 0 ? 18 : 0}px">
+        <span class="chk-icon">${STATUS_ICON[it.status]}</span><span class="chk-text">${it.text}</span>
+      </div>`
+    )
+    .join("");
+  return `<details class="bar-row expandable">
+    <summary>
+      <div class="bar-row-top">
+        <span class="bar-row-name">${name}</span>
+        <span class="bar-row-frac">${s.done}/${s.total} <span class="chev">▸</span></span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" data-final-width="${s.pct}"></div></div>
+    </summary>
+    <div class="chk-list">${rows}</div>
+  </details>`;
+}
+
+// Same idea for a DSA topic: aggregate bar as <summary>, full question list inside.
+function expandableTopicRow(topic) {
+  const total = topic.rows.length;
+  const done = topic.rows.filter((r) => r.status === "x" || r.status === "★").length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const rows = topic.rows
+    .map((r, idx) => {
+      const link = r.url ? `<a href="${r.url}" target="_blank" rel="noopener">${r.title}</a>` : r.title;
+      return `<div class="q-row q-${STATUS_CLASS[r.status]}">
+        <span class="chk-icon">${STATUS_ICON[r.status]}</span>
+        <span class="q-num">${idx + 1}.</span>
+        <span class="q-title">${link}</span>
+        <span class="q-diff q-diff-${r.diff}">${r.diff}</span>
+        <span class="q-tier">${r.tier}</span>
+      </div>`;
+    })
+    .join("");
+  return `<details class="bar-row expandable">
+    <summary>
+      <div class="bar-row-top">
+        <span class="bar-row-name">${topic.code} · ${topic.name}</span>
+        <span class="bar-row-frac">${done}/${total} <span class="chev">▸</span></span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" data-final-width="${pct}"></div></div>
+    </summary>
+    <div class="q-list">${rows}</div>
+  </details>`;
 }
 
 function statCard(num, label) {
@@ -280,15 +521,28 @@ async function main() {
   if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 
   try {
-    const [lldMd, dsaMd, dsaQMd, dsaRevMd] = await Promise.all([
-      fetchText(FILES.lldTracker),
-      fetchText(FILES.dsaTracker),
-      fetchText(FILES.dsaQuestions),
-      fetchText(FILES.dsaRevision),
-    ]);
+    const [lldMd, dsaMd, dsaQMd, dsaRevMd, lldCurriculumMd, dsaCurriculumMd, dsaCheatsheetMd, dsaJavaSheetMd] =
+      await Promise.all([
+        fetchText(FILES.lldTracker),
+        fetchText(FILES.dsaTracker),
+        fetchText(FILES.dsaQuestions),
+        fetchText(FILES.dsaRevision),
+        fetchText(FILES.lldCurriculum),
+        fetchText(FILES.dsaCurriculum),
+        fetchText(FILES.dsaCheatsheet),
+        fetchText(FILES.dsaJavaSheet),
+      ]);
 
     const lldHours = renderLLD(lldMd);
     const dsaHours = renderDSA(dsaMd, dsaQMd, dsaRevMd);
+
+    document.getElementById("lld-curriculum").innerHTML = renderMarkdown(lldCurriculumMd, "LLD-Prep/");
+    document.getElementById("dsa-curriculum").innerHTML = renderMarkdown(dsaCurriculumMd, "DSA-Prep/");
+    document.getElementById("cheatsheet-content").innerHTML = renderMarkdown(dsaCheatsheetMd, "DSA-Prep/");
+    document.getElementById("javasheet-content").innerHTML = renderMarkdown(dsaJavaSheetMd, "DSA-Prep/notes/");
+
+    await renderNotes("lld-notes", FILES.lldNotesManifest, FILES.lldNotesDir);
+    await renderNotes("dsa-notes", FILES.dsaNotesManifest, FILES.dsaNotesDir);
 
     const totalHoursEl = document.getElementById("hero-hours");
     if (totalHoursEl) {
@@ -305,6 +559,33 @@ async function main() {
       the live GitHub Pages URL.</div>`;
     document.getElementById("loading-note")?.remove();
   }
+}
+
+async function renderNotes(containerId, manifestPath, dir) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const manifest = await fetchJson(manifestPath, []);
+  if (!manifest.length) {
+    container.innerHTML = `<div class="empty-note">No notes published yet — they'll show up here as soon as they're written.</div>`;
+    return;
+  }
+  const sections = await Promise.all(
+    manifest.map(async (n) => {
+      try {
+        const md = await fetchText(dir + n.file);
+        const handwrittenLink = n.handwritten
+          ? `<a href="${dir}${n.handwritten}" target="_blank" rel="noopener" class="note-hw-link">handwritten version ↗</a>`
+          : "";
+        return `<details class="note-block">
+          <summary>${n.title} ${handwrittenLink}</summary>
+          <div class="md-content">${renderMarkdown(md, dir)}</div>
+        </details>`;
+      } catch {
+        return "";
+      }
+    })
+  );
+  container.innerHTML = sections.join("");
 }
 
 function renderLLD(md) {
@@ -340,13 +621,8 @@ function renderLLD(md) {
     statCard(Math.round(lldHours * 10) / 10, "Hours invested"),
   ].join("");
 
-  // phase bars
-  document.getElementById("lld-phase-bars").innerHTML = phases
-    .map((p) => {
-      const s = summarize(p.items);
-      return barRow(p.name, s.done, s.total, s.pct);
-    })
-    .join("");
+  // phase bars — expandable, showing every pattern/problem in the phase
+  document.getElementById("lld-phase-bars").innerHTML = phases.map((p) => expandablePhaseRow(p.name, p.items)).join("");
 
   // timeline
   document.getElementById("lld-timeline").innerHTML = log.length
@@ -412,21 +688,10 @@ function renderDSA(md, questionsMd, revisionMd) {
     <div class="pill">STRETCH <b>${q.byTier.S.done}/${q.byTier.S.total}</b></div>
   `;
 
-  document.getElementById("dsa-topic-bars").innerHTML = topics
-    .map((t) => {
-      const total = t.rows.length;
-      const done = t.rows.filter((r) => r.status === "x" || r.status === "★").length;
-      const pct = total ? Math.round((done / total) * 100) : 0;
-      return barRow(`${t.code} · ${t.name}`, done, total, pct);
-    })
-    .join("");
+  // topic bars — expandable, showing every one of the 476 questions
+  document.getElementById("dsa-topic-bars").innerHTML = topics.map(expandableTopicRow).join("");
 
-  document.getElementById("dsa-phase-bars").innerHTML = phases
-    .map((p) => {
-      const s = summarize(p.items);
-      return barRow(p.name, s.done, s.total, s.pct);
-    })
-    .join("");
+  document.getElementById("dsa-phase-bars").innerHTML = phases.map((p) => expandablePhaseRow(p.name, p.items)).join("");
 
   document.getElementById("dsa-timeline").innerHTML = log.length
     ? log.slice(0, 6).map(renderTimelineItem).join("")

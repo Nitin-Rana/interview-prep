@@ -436,3 +436,208 @@ footer a { color: var(--text-dim); }
   display: inline-block;
   animation: pulse 2s ease-in-out infinite;
 }
+
+/* ---------- expandable phase / topic rows ---------- */
+
+details.expandable { cursor: default; }
+
+details.expandable > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 2px 0;
+}
+details.expandable > summary::-webkit-details-marker { display: none; }
+
+.chev {
+  display: inline-block;
+  transition: transform .18s ease;
+  color: var(--text-dimmer);
+  font-size: 10px;
+}
+details.expandable[open] .chev { transform: rotate(90deg); }
+
+details.expandable > summary:hover .bar-row-name { color: var(--accent); }
+
+.chk-list, .q-list {
+  margin-top: 12px;
+  padding: 10px 4px 2px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.chk-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.chk-icon { flex: none; width: 14px; text-align: center; font-size: 11px; }
+.chk-todo .chk-icon { color: var(--text-dimmer); }
+.chk-done .chk-icon, .chk-mastered .chk-icon { color: var(--accent); }
+.chk-partial .chk-icon { color: var(--accent-warn); }
+.chk-done .chk-text, .chk-mastered .chk-text { color: var(--text-dim); }
+.chk-todo .chk-text { color: var(--text-dim); }
+
+.q-row {
+  display: grid;
+  grid-template-columns: 16px 26px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 3px 0;
+}
+.q-row .chk-icon { width: 16px; }
+.q-done .chk-icon, .q-mastered .chk-icon { color: var(--accent); }
+.q-partial .chk-icon { color: var(--accent-warn); }
+.q-todo .chk-icon { color: var(--text-dimmer); }
+
+.q-num { color: var(--text-dimmer); font-size: 11.5px; }
+.q-title a { color: var(--text-dim); text-decoration: none; }
+.q-title a:hover { color: var(--accent); text-decoration: underline; }
+.q-done .q-title a, .q-mastered .q-title a { color: var(--text); }
+
+.q-diff {
+  font-size: 10.5px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--bg);
+}
+.q-diff-E { background: var(--accent-2); }
+.q-diff-M { background: var(--accent); }
+.q-diff-H { background: var(--accent-warn); }
+
+.q-tier {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+/* ---------- notes / curriculum blocks ---------- */
+
+.note-block {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 14px;
+}
+
+.note-block > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14.5px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.note-block > summary::-webkit-details-marker { display: none; }
+.note-block > summary::after {
+  content: "▸";
+  color: var(--text-dimmer);
+  font-size: 11px;
+  transition: transform .18s ease;
+  margin-left: auto;
+  flex: none;
+}
+.note-block[open] > summary::after { transform: rotate(90deg); }
+
+.note-hw-link {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--accent-2);
+  text-decoration: none;
+  margin-right: 8px;
+}
+.note-hw-link:hover { text-decoration: underline; }
+
+.curriculum-block > summary { color: var(--text-dim); }
+
+/* ---------- rendered markdown content ---------- */
+
+.md-content { font-size: 14px; color: var(--text-dim); line-height: 1.65; }
+
+.md-content .md-h { color: var(--text); font-weight: 700; letter-spacing: -0.01em; margin: 24px 0 10px; }
+.md-content .md-h:first-child { margin-top: 4px; }
+.md-content .md-h1 { font-size: 20px; }
+.md-content .md-h2 { font-size: 17px; padding-top: 8px; border-top: 1px solid var(--border); margin-top: 28px; }
+.md-content .md-h2:first-child { border-top: none; margin-top: 4px; padding-top: 0; }
+.md-content .md-h3 { font-size: 15px; }
+.md-content .md-h4, .md-content .md-h5, .md-content .md-h6 { font-size: 13.5px; color: var(--text-dim); }
+
+.md-content .md-p { margin: 10px 0; }
+.md-content .md-p code, .md-content li code {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12.5px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  color: var(--accent);
+}
+.md-content strong { color: var(--text); font-weight: 700; }
+.md-content a { color: var(--accent-2); text-decoration: none; }
+.md-content a:hover { text-decoration: underline; }
+
+.md-content .md-list { margin: 8px 0 14px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.md-content .md-list .md-list { margin: 6px 0 0; }
+
+.md-content .md-hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+.md-content .md-code {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 12px 0 16px;
+}
+.md-content .md-code code {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre;
+}
+
+.md-content .md-table-wrap { overflow-x: auto; margin: 14px 0 18px; }
+.md-content .md-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.md-content .md-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--text-dimmer);
+  font-weight: 600;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.md-content .md-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.md-content .md-table tr:last-child td { border-bottom: none; }
+.md-content .md-table code {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 11.5px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  color: var(--accent);
+  white-space: nowrap;
+}
