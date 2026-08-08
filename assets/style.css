@@ -132,11 +132,37 @@ body {
 }
 .theme-toggle:hover { color: var(--text); transform: translateY(-1px); }
 
+/* Below ~640px the brand name + all nav links no longer fit one row —
+   letting them wrap mid-row breaks the brand-dot alignment beside "Nitin
+   Rana", so wrap the whole bar onto two rows instead: brand+toggle on top,
+   links in a scrollable row underneath. */
+@media (max-width: 640px) {
+  .topnav .wrap {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 12px;
+    padding-bottom: 10px;
+    row-gap: 10px;
+  }
+  .brand { white-space: nowrap; }
+  .navlinks {
+    width: 100%;
+    order: 3;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .navlinks a { flex: 0 0 auto; }
+}
+
 /* ---------- hero ---------- */
 
 .hero {
   padding: 72px 0 40px;
   border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 36px 0 32px; }
 }
 
 .eyebrow {
