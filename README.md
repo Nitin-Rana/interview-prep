@@ -33,6 +33,16 @@ python -m http.server 8000
 # then open http://localhost:8000
 ```
 
+## If you edit assets/app.js or assets/style.css
+
+GitHub Pages serves both with cacheable headers, and browsers don't reliably
+re-fetch them on a normal reload. `index.html` references them with a
+`?v=N` query string (`assets/app.js?v=2`) specifically to force a fresh
+fetch after a deploy — **bump that number** any time you change either
+file, or visitors (including you) may silently keep running the old
+version after a push. The markdown trackers themselves are fetched with
+`cache: "no-store"` in `app.js`, so they always update without this.
+
 ## Structure
 
 ```
