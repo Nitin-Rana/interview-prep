@@ -316,7 +316,8 @@ section.panel {
 }
 
 .status-card .k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-dimmer); white-space: nowrap; }
-.status-card .v { font-size: 14px; color: var(--text); line-height: 1.6; }
+.status-card .v { font-size: 14px; color: var(--text); line-height: 1.6; overflow-wrap: anywhere; }
+.status-block { min-width: 0; }
 .status-pill .k { margin: 0; }
 .status-block .k { margin-bottom: 6px; }
 
