@@ -385,6 +385,7 @@ section.panel {
 }
 
 .tl-date { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+.tl-meta { color: var(--text-dimmer); font-weight: 500; }
 .tl-body { font-size: 13.5px; color: var(--text-dim); }
 .tl-follow { font-size: 12.5px; color: var(--text-dimmer); margin-top: 6px; font-style: italic; }
 

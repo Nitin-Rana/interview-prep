@@ -16,7 +16,10 @@ const STATUS_WEIGHT = { " ": 0, "x": 1, "~": 0.5, "★": 1 };
 async function fetchText(path) {
   const res = await fetch(path, { cache: "no-store" });
   if (!res.ok) throw new Error(`Could not load ${path} (${res.status})`);
-  return res.text();
+  const text = await res.text();
+  // Git on Windows checks these files out as CRLF; every parser below assumes
+  // bare \n, so normalize once here rather than defend it in every regex.
+  return text.replace(/\r\n/g, "\n");
 }
 
 /* ---------- generic checklist parser (00_PROGRESS_TRACKER.md style) ---------- */
@@ -50,7 +53,7 @@ function stripMd(s) {
   return s
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/`/g, "")
-    .replace(/\*\*/g, "")
+    .replace(/\*+/g, "")
     .trim();
 }
 
@@ -80,23 +83,39 @@ function parseCurrentStatus(md) {
 
 /* ---------- session log ---------- */
 
+// Session Log columns are: Date | Phase | Hours | Covered | [Questions] | Notes/Follow-up
+// (the DSA log has an extra Questions column the LLD log doesn't). We locate
+// Phase/Hours/Notes by position from the ends since the middle is variable width.
 function parseSessionLog(md) {
   const idx = md.indexOf("## Session Log");
   if (idx === -1) return [];
-  const section = md.slice(idx);
-  const rows = [...section.matchAll(/^\|\s*(\d{4}-\d{2}-\d{2})\s*\|(.+)\|(.*)\|$/gm)];
+  const end = md.indexOf("\n## ", idx + 1);
+  const section = md.slice(idx, end === -1 ? undefined : end);
+  const rows = [...section.matchAll(/^\|\s*(\d{4}-\d{2}-\d{2})\s*\|(.+)\|$/gm)];
   return rows
     .map((r) => {
-      const cells = r[0].split("|").map((c) => c.trim()).filter((c) => c.length);
-      // cells: [date, covered, ...maybe questions..., followup]
-      if (cells.length < 3) return null;
-      const date = cells[0];
-      const followup = cells[cells.length - 1];
-      const covered = cells.slice(1, cells.length - 1).join(" — ");
-      return { date, covered: stripMd(covered), followup: stripMd(followup) };
+      const rest = r[2].split("|").map((c) => c.trim());
+      // rest = [Phase, Hours, Covered, ...maybe Questions..., Notes/Follow-up]
+      if (rest.length < 4) return null;
+      const [phase, hours, ...tail] = rest;
+      const followup = tail[tail.length - 1];
+      const covered = tail.slice(0, tail.length - 1).join(" — ");
+      const hoursNum = parseFloat(hours);
+      return {
+        date: r[1],
+        phase: stripMd(phase),
+        hours: isNaN(hoursNum) ? null : hoursNum,
+        hoursLabel: stripMd(hours),
+        covered: stripMd(covered),
+        followup: stripMd(followup),
+      };
     })
     .filter(Boolean)
     .filter((r) => !/^-+$/.test(r.covered));
+}
+
+function sumHours(log) {
+  return log.reduce((sum, r) => sum + (r.hours ?? 0), 0);
 }
 
 /* ---------- DSA question tracker (table rows) ---------- */
@@ -268,8 +287,14 @@ async function main() {
       fetchText(FILES.dsaRevision),
     ]);
 
-    renderLLD(lldMd);
-    renderDSA(dsaMd, dsaQMd, dsaRevMd);
+    const lldHours = renderLLD(lldMd);
+    const dsaHours = renderDSA(dsaMd, dsaQMd, dsaRevMd);
+
+    const totalHoursEl = document.getElementById("hero-hours");
+    if (totalHoursEl) {
+      const total = Math.round((lldHours + dsaHours) * 10) / 10;
+      totalHoursEl.textContent = total > 0 ? `${total}h invested so far` : "tracking starts next session";
+    }
 
     revealOnScroll(".ring-card, .stat-card, .bar-row, .tl-item");
   } catch (err) {
@@ -306,11 +331,13 @@ function renderLLD(md) {
   `;
 
   // stat cards
+  const lldHours = sumHours(log);
   document.getElementById("lld-stats").innerHTML = [
     statCard(overall.done, "Items done"),
     statCard(overall.total, "Total items"),
     statCard(phases.length, "Phases"),
     statCard(log.length, "Sessions logged"),
+    statCard(Math.round(lldHours * 10) / 10, "Hours invested"),
   ].join("");
 
   // phase bars
@@ -323,17 +350,19 @@ function renderLLD(md) {
 
   // timeline
   document.getElementById("lld-timeline").innerHTML = log.length
-    ? log
-        .slice(0, 6)
-        .map(
-          (r) => `<div class="tl-item">
-            <div class="tl-date">${r.date}</div>
-            <div class="tl-body">${r.covered}</div>
-            ${r.followup ? `<div class="tl-follow">${r.followup}</div>` : ""}
-          </div>`
-        )
-        .join("")
+    ? log.slice(0, 6).map(renderTimelineItem).join("")
     : `<div class="empty-note">No sessions logged yet.</div>`;
+
+  return lldHours;
+}
+
+function renderTimelineItem(r) {
+  const meta = [r.phase, r.hoursLabel].filter((v) => v && v !== "—").join(" · ");
+  return `<div class="tl-item">
+    <div class="tl-date">${r.date}${meta ? ` <span class="tl-meta">— ${meta}</span>` : ""}</div>
+    <div class="tl-body">${r.covered}</div>
+    ${r.followup ? `<div class="tl-follow">${r.followup}</div>` : ""}
+  </div>`;
 }
 
 function renderDSA(md, questionsMd, revisionMd) {
@@ -364,6 +393,7 @@ function renderDSA(md, questionsMd, revisionMd) {
     <div class="status-item"><div class="k">Next up</div><div class="v">${status.nextUp ?? "—"}</div></div>
   `;
 
+  const dsaHours = sumHours(log);
   document.getElementById("dsa-stats").innerHTML = [
     statCard(q.done, "Questions solved"),
     statCard(q.total, "Total questions"),
@@ -371,6 +401,7 @@ function renderDSA(md, questionsMd, revisionMd) {
     statCard(topics.length, "Topics"),
     statCard(overallPhase.done, "Checklist items done"),
     statCard(revQueue.length, "In revision queue"),
+    statCard(Math.round(dsaHours * 10) / 10, "Hours invested"),
   ].join("");
 
   document.getElementById("dsa-pills").innerHTML = `
@@ -398,16 +429,7 @@ function renderDSA(md, questionsMd, revisionMd) {
     .join("");
 
   document.getElementById("dsa-timeline").innerHTML = log.length
-    ? log
-        .slice(0, 6)
-        .map(
-          (r) => `<div class="tl-item">
-            <div class="tl-date">${r.date}</div>
-            <div class="tl-body">${r.covered}</div>
-            ${r.followup ? `<div class="tl-follow">${r.followup}</div>` : ""}
-          </div>`
-        )
-        .join("")
+    ? log.slice(0, 6).map(renderTimelineItem).join("")
     : `<div class="empty-note">No sessions logged yet.</div>`;
 
   const revBody = document.getElementById("dsa-revision-body");
@@ -419,6 +441,8 @@ function renderDSA(md, questionsMd, revisionMd) {
   } else {
     document.getElementById("dsa-revision-table").style.display = "none";
   }
+
+  return dsaHours;
 }
 
 document.addEventListener("DOMContentLoaded", main);

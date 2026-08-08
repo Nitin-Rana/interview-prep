@@ -11,7 +11,7 @@ This file is the **reference syllabus** (what and why). The checklist with live 
 1. **I teach** a concept or pattern — short, concrete, Java-first, interview-framed (not academic).
 2. **You implement** — I give you a small spec, you write the Java code yourself in `solutions/`.
 3. **I review** your code like an interviewer would — correctness, SOLID adherence, naming, missed edge cases, better pattern choice — and we iterate.
-4. **We log it** — tracker checkbox ticked, session log updated, any reusable notes saved to `notes/` or `patterns/`.
+4. **We log it** — tracker checkbox ticked, session log updated (including a Phase tag and hours spent this session, asked for at wrap-up), any reusable notes saved to `notes/` or `patterns/`.
 
 For LLD *problems* (Phase 2+), the loop is stricter and mirrors the real interview:
 1. I give you only a one-paragraph prompt (like an interviewer would).

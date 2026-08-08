@@ -24,6 +24,7 @@
 - **Last session:** 2026-08-09 — DSA prep program designed: curriculum, 12-week phase plan, 476-question tracker, problem-solving framework, pattern cheat sheet, revision system.
 - **Next up:** Phase 0 → Complexity analysis refresher + Java DSA toolkit (collections, comparators, pitfalls), then Week 1 = Arrays / Prefix Sum / Two Pointers.
 - **Questions solved:** 0 / 476
+- **Hours logged:** 0h tracked (see Session Log)
 
 ---
 
@@ -36,6 +37,7 @@
 | Topics closed out (all CORE done + notes written) | 20 / 20 | 0 |
 | Timed mocks completed | 10 | 0 |
 | Revision passes on flagged problems | 3 full passes | 0 |
+| Hours invested (with Claude) | ~180–220h over 12 weeks at planned pace | 0h |
 
 **Actual mix in the list:** 81 Easy (17%) / 302 Medium (63%) / 93 Hard (20%) — the right shape for a Google-and-below loop, where mediums-with-a-twist dominate and hards cluster in graphs, DP and intervals.
 
@@ -145,7 +147,7 @@ Weekly load ≈ **35–45 questions** at ~30–40 min average → roughly **15�
 1. **I teach the pattern first** — the trigger ("when do I reach for this?"), the invariant, the canonical template, and the 2–3 ways it gets disguised. Java-first, interview-framed.
 2. **You solve** — problems from [03_QUESTION_TRACKER.md](03_QUESTION_TRACKER.md), written yourself in `solutions/`. Brute force stated out loud first, *then* optimize — this is the interview skill, not a formality.
 3. **I review like an interviewer** — correctness on edge cases, complexity claims, naming, whether a cleaner pattern existed, and what follow-up I'd ask next. We iterate until it's interview-clean.
-4. **We log it** — tick the question in the tracker, update this file, and any reusable insight goes into `notes/`.
+4. **We log it** — tick the question in the tracker, update this file (including Phase tag + hours spent this session, self-reported at wrap-up), and any reusable insight goes into `notes/`.
 
 **A problem counts as DONE only when:** you solved it without looking at the editorial, you can state time & space complexity correctly, and you can explain *why* the pattern applies. Peeked at a hint? Mark `[~]` and add it to [05_REVISION_QUEUE.md](05_REVISION_QUEUE.md).
 
@@ -160,8 +162,11 @@ Weekly load ≈ **35–45 questions** at ~30–40 min average → roughly **15�
 ---
 
 ## Session Log
-_(Append one entry per session — date, what we covered, what needs follow-up)_
+_(Append one entry per session — date, phase, hours spent working with Claude this session, what we covered, questions solved, what needs follow-up. Hours are self-reported at session end — round to the nearest quarter hour.)_
 
-| Date | Covered | Questions | Notes / Follow-up |
-|------|---------|-----------|--------------------|
-| 2026-08-09 | Program setup: curriculum, 12-week phase plan, 476-question tracker across 20 topics, 9-step problem-solving framework, pattern cheat sheet scaffold, revision queue. | 0 | Start Phase 0 next session: complexity depth + Java toolkit drill. Don't skip it — the toolkit fumbles are what cost time in real rounds. |
+| Date | Phase | Hours | Covered | Questions | Notes / Follow-up |
+|------|-------|-------|---------|-----------|--------------------|
+| 2026-08-09 | Setup | — *(untracked)* | Program setup: curriculum, 12-week phase plan, 476-question tracker across 20 topics, 9-step problem-solving framework, pattern cheat sheet scaffold, revision queue. | 0 | Start Phase 0 next session: complexity depth + Java toolkit drill. Don't skip it — the toolkit fumbles are what cost time in real rounds. |
+| 2026-08-09 | Setup | — *(untracked)* | Built the live progress site (InterviewPrepHub): parses both trackers directly, deployed to GitHub Pages. Added Phase + Hours columns to both Session Logs so time investment is tracked going forward. | 0 | Tracking starts from the next real study session — tell Claude the hours at wrap-up and it gets logged here. |
+
+**Total hours logged:** 0h *(tracking starts from the next study session — rows above predate it)*

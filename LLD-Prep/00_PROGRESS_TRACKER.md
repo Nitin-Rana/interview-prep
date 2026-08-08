@@ -14,6 +14,7 @@
 - **Phase:** Phase 0 — Foundations
 - **Last session:** SOLID deep dive done (S/O/L/I/D with violation→fix code, the "OCP+LSP+ISP → depend on abstractions, DIP formalizes it" throughline) + exercise (`OrderProcessor` refactor hitting all 5 violations) completed across 3 review rounds, compiles and runs. Notes saved to notes/02_solid.md + handwritten notes/02_solid_handwritten.html.
 - **Next up:** UML class diagram notation (assoc., aggregation, composition, inheritance)
+- **Hours logged:** 0h tracked (2 pre-tracking sessions not timed — see Session Log)
 
 ---
 
@@ -96,9 +97,11 @@
 ---
 
 ## Session Log
-_(Append one entry per session — date, what we covered, what needs follow-up)_
+_(Append one entry per session — date, phase, hours spent working with Claude this session, what we covered, what needs follow-up. Hours are self-reported at session end — round to the nearest quarter hour.)_
 
-| Date | Covered | Notes / Follow-up |
-|------|---------|--------------------|
-| 2026-08-08 | Phase 0: OOP pillars (encapsulation, abstraction, inheritance/LSP incl. Stack-extends-Vector & Circle/Ellipse, polymorphism, composition over inheritance/SimUDuck, interface vs abstract class, thread-safety × encapsulation: synchronized/volatile/double-checked locking/deadlock ordering/immutability). Exercise: Bird/Ostrich LSP fix via composition — iterated 4 rounds to a clean compile, runs correctly. JDK 21 (IntelliJ's bundled JBR) added to PATH. | Sparrow-only in demo — Penguin/Duck variants left as optional polish, not blocking. Next: SOLID. |
-| 2026-08-09 | Phase 0: SOLID (S/O/L/I/D, each with violation→fix code; LSP reframed as "what makes OCP safe"; DI-vs-DIP distinction; UnsupportedOperationException as the shared tell for LSP/ISP violations). Exercise: refactor a 5-violation `OrderProcessor` god class — 3 review rounds (signature mismatches, missing `public` on overrides, undefined `Connection` type, non-static inner classes, method-name typos in `main`), final pass fixed directly with inline `FIX:` comments per change, compiles and runs end to end. Both notes formats (plain .md + handwritten artifact) delivered per lesson going forward. | Concurrency checklist expanded into its own full sub-list per user request — synced treatment across tracker + curriculum. Next: UML notation + 9-step framework. |
+| Date | Phase | Hours | Covered | Notes / Follow-up |
+|------|-------|-------|---------|--------------------|
+| 2026-08-08 | Phase 0 | — *(untracked)* | Phase 0: OOP pillars (encapsulation, abstraction, inheritance/LSP incl. Stack-extends-Vector & Circle/Ellipse, polymorphism, composition over inheritance/SimUDuck, interface vs abstract class, thread-safety × encapsulation: synchronized/volatile/double-checked locking/deadlock ordering/immutability). Exercise: Bird/Ostrich LSP fix via composition — iterated 4 rounds to a clean compile, runs correctly. JDK 21 (IntelliJ's bundled JBR) added to PATH. | Sparrow-only in demo — Penguin/Duck variants left as optional polish, not blocking. Next: SOLID. |
+| 2026-08-09 | Phase 0 | — *(untracked)* | Phase 0: SOLID (S/O/L/I/D, each with violation→fix code; LSP reframed as "what makes OCP safe"; DI-vs-DIP distinction; UnsupportedOperationException as the shared tell for LSP/ISP violations). Exercise: refactor a 5-violation `OrderProcessor` god class — 3 review rounds (signature mismatches, missing `public` on overrides, undefined `Connection` type, non-static inner classes, method-name typos in `main`), final pass fixed directly with inline `FIX:` comments per change, compiles and runs end to end. Both notes formats (plain .md + handwritten artifact) delivered per lesson going forward. | Concurrency checklist expanded into its own full sub-list per user request — synced treatment across tracker + curriculum. Next: UML notation + 9-step framework. |
+
+**Total hours logged:** 0h *(tracking starts from the next session — the two rows above predate it)*
