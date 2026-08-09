@@ -29,19 +29,28 @@ line explaining WHY you picked that relationship type (not just what it's called
 
 ```
 // TODO: Person / Member / Librarian relationship
+Person o-- Member
+Person o-- Librarian
 
 // TODO: Library / Book relationship
+Library "1" o-- "*" Book
 
 // TODO: Library / Librarian relationship
+Library "1" *-- "*" Librarian
 
 // TODO: Member / Loan / Book relationships (with multiplicities)
+Member "1" o-- "*" Loan
+Member "1" o-- "*" Loan
 
 // TODO: Catalog / Searchable relationship
+Catalog ..|> Searchable
 
 // TODO: LoanService / NotificationService relationship
+LoanService ..> NotificationService
 ```
 
 ## Follow-up question to answer after sketching
 
 If someone on the interview panel asked "why isn't `Library`-to-`Book` an aggregation instead of a
 composition?" — what's your answer? Write 2-3 sentences.
+It should be an aggregation relationship as library does have strong owernship of book. The book exist without Library.
