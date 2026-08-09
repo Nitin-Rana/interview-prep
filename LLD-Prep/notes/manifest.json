@@ -1,5 +1,6 @@
 [
   { "title": "Lesson 1 — OOP Pillars (Interview Depth)", "file": "01_oop_pillars.md", "handwritten": "01_oop_pillars_handwritten.html" },
   { "title": "Lesson 2 — SOLID Principles", "file": "02_solid.md", "handwritten": "02_solid_handwritten.html" },
-  { "title": "Lesson 3 — UML Class Diagram Notation", "file": "03_uml_notation.md", "handwritten": "03_uml_notation_handwritten.html" }
+  { "title": "Lesson 3 — UML Class Diagram Notation", "file": "03_uml_notation.md", "handwritten": "03_uml_notation_handwritten.html" },
+  { "title": "Lesson 5 — Command Pattern (+ Strategy comparison)", "file": "05_command.md", "handwritten": "05_command_handwritten.html" }
 ]
