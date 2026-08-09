@@ -110,6 +110,61 @@ Naming "Command" isn't the point — explaining what it buys you is:
   combine several into a `MacroCommand implements Command` that loops over a
   `List<Command>` — one button press that does several things atomically.
 
+## Command vs. Strategy — the confusion everyone hits
+
+They're structurally identical: an interface with one method, a holder class with a
+reference to it, concrete implementations swapped in. So "couldn't this just be
+Strategy?" is a fair question, not a naive one — GoF itself flags these two as easy to
+conflate. The difference is intent, not shape.
+
+```java
+// Strategy — same fixed task, swap the algorithm
+interface PaymentStrategy { void pay(double amount); }
+class Checkout {
+    private PaymentStrategy strategy;
+    void checkout(double amt) { strategy.pay(amt); }   // takes a parameter
+}
+
+// Command — a specific, fully-bound action, receiver baked in
+interface Command { void execute(); }
+class Button {
+    private Command command;
+    void press() { command.execute(); }                 // takes nothing
+}
+```
+
+**Strategy answers "how should this fixed task be done?"** — the operation itself never
+changes (`pay`, `sort`, `compress`), only *which algorithm* performs it. The method
+usually takes parameters, because the algorithm needs data to act on. The strategy
+object is a reusable, stateless *policy* — one `CreditCardPayment` instance can serve a
+thousand different checkouts.
+
+**Command answers "what specific action should happen, to what, and when?"** — not an
+interchangeable way to do one task, but a frozen, storable *unit of execution* with
+everything already bound in (receiver, action, arguments), so `execute()` typically takes
+nothing. `new TurnOnCommand(tv)` isn't "a way of turning on" — it's already "turn on
+*this* TV," fully specified, ready to be delayed, repeated, logged, or reversed.
+
+**The test that actually separates them:** would it ever make sense to put these objects
+in a list of "things that happened" or "things to do later"? `Queue<Command>` — makes
+total sense (job queue, undo history, `MacroCommand` batching). `Queue<PaymentStrategy>`
+— nonsensical; a strategy isn't an event or a pending action, it's a plugged-in
+algorithm. You'd never "undo a strategy." **If undo, logging, queuing, retrying, or
+"execute later" is anywhere near the requirements, that's Command.**
+
+Honest answer to "couldn't you have just used Strategy" for the bare remote (press
+button, immediately do the one fixed thing, never undo it): yes, something Strategy-
+shaped would technically run correctly. But (1) a `Command` binds its receiver in at
+construction, which is fighting Strategy's reusable/generic shape; and (2) the moment
+undo shows up — which a remote basically requires (history, last-channel) — `Command`
+already has the shape for it (`void undo()`, a `Deque<Command>` history) with zero
+refactor, where a Strategy-shaped version would need renaming and restructuring exactly
+when the real requirement lands.
+
+**Rule of thumb:** Strategy = one of several interchangeable ways to do a fixed task,
+chosen once, used immediately. Command = a specific, storable, possibly-undoable action,
+fully bound, that might not run immediately at all.
+
 ## Where this shows up beyond the remote
 
 - **Elevator button panel** (Phase 3) — floor buttons are Invokers, the elevator car is
@@ -128,6 +183,9 @@ Naming "Command" isn't the point — explaining what it buys you is:
 - How would you add undo to this design — which role gets the new method?
 - What's the difference between Command and just passing a `Runnable`/lambda? (Hint:
   when do you actually need the *object*, not just the behavior — undo, logging, queuing.)
+- Command and Strategy have identical structure. State the "things that happened or
+  things to do later" test in one sentence, and name one concrete requirement (not just
+  "it feels different") that would force you to pick one over the other.
 
 ## Exercise
 
