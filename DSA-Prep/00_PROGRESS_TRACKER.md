@@ -19,12 +19,12 @@
 
 ## Current Status
 
-- **Phase:** Phase 0 — Not started (plan just created)
-- **Week:** Week 0 (setup)
-- **Last session:** 2026-08-09 — DSA prep program designed: curriculum, 12-week phase plan, 476-question tracker, problem-solving framework, pattern cheat sheet, revision system.
-- **Next up:** Phase 0 → Complexity analysis refresher + Java DSA toolkit (collections, comparators, pitfalls), then Week 1 = Arrays / Prefix Sum / Two Pointers.
+- **Phase:** Phase 0 — In progress
+- **Week:** Week 1 (Aug 09–15)
+- **Last session:** 2026-08-09 — Complexity analysis at interview depth: amortized analysis (ArrayList doubling, DSU with path compression + union by rank), recurrence solving via recursion-tree counting, recursion stack space, and how to state complexity out loud.
+- **Next up:** Phase 0 → self-test recall on complexity analysis, then Java DSA toolkit drill (collections, comparators, pitfalls), then Week 1 = Arrays / Prefix Sum / Two Pointers.
 - **Questions solved:** 0 / 476
-- **Hours logged:** 4h tracked (see Session Log)
+- **Hours logged:** 5h tracked (see Session Log)
 
 ---
 
@@ -45,7 +45,7 @@
 
 ## Phase 0 — Foundations & Toolkit (Week 1, ~3 sessions — do NOT skip even with a good base)
 
-- [ ] **Complexity at interview depth** — amortized analysis (dynamic array, DSU), recurrence solving (Master theorem cases you actually need), space complexity of recursion (stack depth), and *how to state complexity out loud* without hand-waving.
+- [~] **Complexity at interview depth** — amortized analysis (dynamic array, DSU), recurrence solving (Master theorem cases you actually need), space complexity of recursion (stack depth), and *how to state complexity out loud* without hand-waving. _(taught; recall check answered directly rather than self-tested — revisit before Mock 1)_
 - [ ] **Java DSA toolkit drill** — the API you must never fumble under pressure:
   - [ ] `ArrayList`, `ArrayDeque` (as both stack and queue — and why never `Stack`/`LinkedList`), `PriorityQueue` (+ custom `Comparator`, and the `poll()` order gotcha)
   - [ ] `HashMap` idioms: `getOrDefault`, `merge`, `computeIfAbsent`, `entrySet` iteration; `LinkedHashMap` for LRU; `TreeMap`/`TreeSet` (`floorKey`, `ceilingKey`, `higherKey`, `subMap`) — the single most under-used interview tool
@@ -168,5 +168,6 @@ _(Append one entry per session — date, phase, hours spent working with Claude 
 |------|-------|-------|---------|-----------|--------------------|
 | 2026-08-09 | Setup | — *(untracked)* | Program setup: curriculum, 12-week phase plan, 476-question tracker across 20 topics, 9-step problem-solving framework, pattern cheat sheet scaffold, revision queue. | 0 | Start Phase 0 next session: complexity depth + Java toolkit drill. Don't skip it — the toolkit fumbles are what cost time in real rounds. |
 | 2026-08-09 | Setup | 4h | Built the live progress site (InterviewPrepHub): parses both trackers directly, deployed to GitHub Pages. Added Phase + Hours columns to both Session Logs. Published full curriculum, all 476 questions, LLD phase items, the pattern cheat sheet, a new Java toolkit reference sheet, and lesson notes onto the site itself. | 0 | Tracking starts from the next real study session — tell Claude the hours at wrap-up and it gets logged here. |
+| 2026-08-09 | Phase 0 | 1h | Taught complexity analysis at interview depth: amortized analysis (`ArrayList` doubling, DSU with path compression + union by rank ≈ O(α(n))), recurrence solving via recursion-tree counting (merge sort O(n log n), subset enumeration T(n)=2T(n-1)+O(1) → O(2ⁿ)), recursion stack space (skewed tree O(n) vs balanced O(log n) DFS), and how to phrase complexity claims out loud. | 0 | Gave a 3-question recall check but answered it directly instead of self-testing — revisit before Mock 1: (1) DSU total time phrasing, (2) subset-enumeration recurrence, (3) skewed-tree DFS stack space. Next: Java toolkit drill. |
 
-**Total hours logged:** 4h *(the setup/site-build session above — study-session tracking starts fresh from Phase 0)*
+**Total hours logged:** 5h
