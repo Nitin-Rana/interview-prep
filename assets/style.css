@@ -646,6 +646,17 @@ details.expandable > summary:hover .bar-row-name { color: var(--accent); }
 
 .md-content .md-hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
+.md-content .md-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 10px;
+}
+
 .md-content .md-code {
   background: var(--bg-elev-2);
   border: 1px solid var(--border);

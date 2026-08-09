@@ -250,6 +250,12 @@ function inlineMd(raw, baseDir = "") {
 
   s = escapeHtml(s);
   s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`);
+  // Images before links — otherwise the link regex below matches everything
+  // after the leading "!" in `![alt](url)`, leaving a stray "!" plus a link.
+  s = s.replace(
+    /!\[([^\]]*)\]\(([^)]+)\)/g,
+    (_, alt, u) => `<img class="md-img" src="${resolveUrl(baseDir, u)}" alt="${alt}" loading="lazy">`
+  );
   s = s.replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     (_, t, u) => `<a href="${resolveUrl(baseDir, u)}" target="_blank" rel="noopener">${t}</a>`
