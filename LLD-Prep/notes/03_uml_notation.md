@@ -51,5 +51,5 @@ Matches PlantUML syntax closely — usable directly if a company's tooling rende
 - Given two classes in a scenario, can you justify which of the 6 relationships fits, not just name one?
 - Can you place all 6 relationships on the weakest→strongest coupling scale from memory?
 
-## Exercise (pending)
-Sketch a text-notation class diagram for a small Library Management System scenario → `solutions/lesson3_uml.md`.
+## Exercise — done
+Sketch a text-notation class diagram for a small Library Management System scenario → `solutions/lesson3_uml.md`. First pass mixed up IS-A/HAS-A (aggregation instead of inheritance for Person→Member/Librarian) and had the aggregation/composition diamonds swapped for Library↔Book and Library↔Librarian — both corrected in the solution file, with the lifecycle test applied explicitly to each one.
